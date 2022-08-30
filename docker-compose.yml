@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  database:
+    container_name: board-mysql
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: p@ssword
+      MYSQL_DATABASE: board
+      MYSQL_TZ: Asia/Seoul
+    ports:
+      - 3310:3306
+    volumes:
+      - ./mysql:/var/lib/mysql
