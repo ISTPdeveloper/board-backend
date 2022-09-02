@@ -265,7 +265,12 @@ cython_debug/
 pyvenv.cfg
 pip-selfcheck.json
 
-### docker mysql
+### docker mysql ###
 mysql
+
+### Redis ###
+# Ignore redis binary dump (dump.rdb) files
+redis
+*.rdb
 
 # End of https://www.toptal.com/developers/gitignore/api/django,venv,python

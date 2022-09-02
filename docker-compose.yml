@@ -1,7 +1,7 @@
-version: '3'
-
+version: "3"
 services:
-  database:
+  # mysql-server
+  mysql:
     container_name: board-mysql
     image: mysql:latest
     restart: always
@@ -13,3 +13,15 @@ services:
       - 3310:3306
     volumes:
       - ./mysql:/var/lib/mysql
+
+  # redis-server
+  redis:
+    container_name: "board-redis"
+    image: redis:latest
+    restart: always
+    command: redis-server /usr/local/conf/redis.conf
+    volumes:
+      - ./redis/data/:/data
+      - ./redis/conf/redis.conf:/usr/local/conf/redis.conf
+    ports:
+      - 6380:6379
