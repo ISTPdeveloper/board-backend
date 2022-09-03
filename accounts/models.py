@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager, PermissionsMixin
+from config.settings.base import DEFAULT_PROFILE_IMAGE
 
 from core.models.base import BaseModel
 from core.s3_options import image_path
@@ -58,6 +59,7 @@ class User(AbstractUser, PermissionsMixin, BaseModel):
         null=True,
         blank=True,
         verbose_name="사진",
+        default=DEFAULT_PROFILE_IMAGE,
     )
     is_verified = models.BooleanField(default=False, verbose_name="문자인증 유무")
     is_superuser = models.BooleanField(default=False, verbose_name="관리자 권한 유무")
@@ -76,7 +78,11 @@ class User(AbstractUser, PermissionsMixin, BaseModel):
 
     class Meta:
         db_table = "user"
-        ordering = ["-created_at"]
+        ordering = ["created_at"]
+        verbose_name = "회원"
+        verbose_name_plural = "게시판 회원"
 
     def __str__(self):
         return str(self.id)
+
+    is_verified.boolean = True

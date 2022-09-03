@@ -10,7 +10,7 @@ class RegisterSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = "__all__"
-        extra_kwargs = {"password": {"write_only": True}}
+        extra_kwargs = {"password1": {"write_only": True}}
 
     try:
 
@@ -18,10 +18,10 @@ class RegisterSerializer(serializers.ModelSerializer):
             self.rd = RedisConnection()
             auth = self.rd.conn.hgetall(validated_data["phone_number"])
             if not auth:
-                raise serializers.ValidationError("휴대폰 인증이 필요해요")
+                raise serializers.ValidationError({"phone_number": "휴대폰 인증이 필요해요"})
             is_verified = auth["is_verified"]
             if is_verified != "1":
-                raise serializers.ValidationError("인증이 완료되지 않았어요")
+                raise serializers.ValidationError({"phone_number": "인증이 완료되지 않았어요"})
             if validated_data["photo"] is None:
                 validated_data["photo"] = DEFAULT_PROFILE_IMAGE
 

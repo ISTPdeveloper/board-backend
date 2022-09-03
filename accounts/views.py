@@ -1,9 +1,9 @@
 from django.shortcuts import render
-from django.http import JsonResponse
 from rest_framework import generics
 from accounts.serializers import LoginSerializer, RegisterSerializer, UserSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import permissions
+from rest_framework.response import Response
 
 
 class RegisterAPIView(generics.GenericAPIView):
@@ -20,19 +20,9 @@ class RegisterAPIView(generics.GenericAPIView):
             access_token = str(token.access_token)
             refresh_token = str(token)
 
-            return JsonResponse(
-                {
-                    "status": "SUCCESS",
-                    "message": f"{user.name}님 환영해요🎈",
-                    "result": {
-                        "user": UserSerializer(
-                            user, context=self.get_serializer_context()
-                        ).data,
-                        "access": access_token,
-                        "refresh": refresh_token,
-                    },
-                },
-                status=200,
+            return Response(
+                data={"access": access_token, "refresh": refresh_token},
+                status=201,
             )
 
 
@@ -50,18 +40,8 @@ class LoginAPIView(generics.GenericAPIView):
             access_token = str(token.access_token)
             refresh_token = str(token)
 
-            return JsonResponse(
-                {
-                    "status": "SUCCESS",
-                    "message": "로그인에 성공했어요",
-                    "result": {
-                        "user": UserSerializer(
-                            user, context=self.get_serializer_context()
-                        ).data,
-                        "access": access_token,
-                        "refresh": refresh_token,
-                    },
-                },
+            return Response(
+                data={"access": access_token, "refresh": refresh_token},
                 status=200,
             )
 
@@ -70,16 +50,16 @@ class LogoutAPIView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
-        token = RefreshToken(request.data.get("refresh"))
-        token.blacklist()
-        return JsonResponse(
-            {
-                "status": "SUCCESS",
-                "message": "다음에 또 만나요ㅠㅠ",
-                "result": "",
-            },
-            status=200,
-        )
+        try:
+            token = RefreshToken(request.data.get("refresh"))
+            print(request.data.get("refresh"))
+            token.blacklist()
+            return Response(
+                status=204,
+            )
+
+        except Exception as e:
+            return Response({"message": "이미 로그아웃 되었어요."}, status=400)
 
 
 class CustomTokenVerifyView(generics.GenericAPIView):
@@ -87,16 +67,8 @@ class CustomTokenVerifyView(generics.GenericAPIView):
 
     def get(self, request):
         user = request.user
-        return JsonResponse(
-            {
-                "status": "SUCCESS",
-                "message": "",
-                "result": {
-                    "id": user.id,
-                    "nickname": user.nickname,
-                    "photo": user.photo.url,
-                },
-            },
+        return Response(
+            data={"id": user.id, "nickname": user.nickname, "photo": user.photo.url},
             status=200,
         )
 
@@ -107,13 +79,7 @@ class ProfileDetailView(generics.GenericAPIView):
 
     def get(self, request):
         user = request.user
-        return JsonResponse(
-            {
-                "status": "SUCCESS",
-                "message": "",
-                "result": UserSerializer(
-                    user, context=self.get_serializer_context()
-                ).data,
-            },
+        return Response(
+            data=UserSerializer(user, context=self.get_serializer_context()).data,
             status=200,
         )

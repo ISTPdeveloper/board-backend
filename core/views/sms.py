@@ -10,7 +10,7 @@ import config.settings.env as ENV
 from json import JSONDecodeError
 from core.redis_connection import RedisConnection
 from rest_framework import generics
-from django.http import JsonResponse
+from rest_framework.response import Response
 
 SMS_AUTH_TIMEOUT = 300
 
@@ -76,13 +76,13 @@ class SMSCodeRequestView(generics.GenericAPIView):
             )
 
             if response.status_code == 202:
-                return JsonResponse({"message": "CODE_SEND_SUCCESS"})
-            return JsonResponse({"message": "CODE_SEND_ERROR"})
+                return Response(status=202)
+            return Response({"message": "CODE_SEND_ERROR"}, status=400)
 
         except KeyError:
-            return JsonResponse({"message": "KEY_ERROR"}, status=400)
+            return Response({"message": "KEY_ERROR"}, status=400)
         except JSONDecodeError:
-            return JsonResponse({"message": "JSON_DECODE_ERROR"}, status=400)
+            return Response({"message": "JSON_DECODE_ERROR"}, status=400)
 
 
 class SMSCodeCheckView(generics.GenericAPIView):
@@ -98,21 +98,21 @@ class SMSCodeCheckView(generics.GenericAPIView):
 
             auth = self.rd.conn.hgetall(phone_number)
             if not auth:
-                return JsonResponse({"message": "CODE_EXPIRED"}, status=400)
+                return Response({"message": "CODE_EXPIRED"}, status=400)
 
             hashed_random_code = auth["hashed_random_code"]
 
             if not bcrypt.checkpw(
                 auth_code.encode("utf-8"), hashed_random_code.encode("utf-8")
             ):
-                return JsonResponse({"message": "CODE_NOT_MATCHED"}, status=400)
+                return Response({"message": "CODE_NOT_MATCHED"}, status=400)
 
             auth["is_verified"] = "1"
 
             self.rd.conn.hmset(phone_number, auth)
-            return JsonResponse({"message": "SUCCESS"}, status=201)
+            return Response(status=201)
 
         except KeyError:
-            return JsonResponse({"message": "KEY_ERROR"}, status=400)
+            return Response({"message": "KEY_ERROR"}, status=400)
         except JSONDecodeError:
-            return JsonResponse({"message": "JSON_DECODE_ERROR"}, status=400)
+            return Response({"message": "JSON_DECODE_ERROR"}, status=400)
