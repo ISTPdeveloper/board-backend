@@ -28,7 +28,6 @@ DJANGO_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "django.contrib.sites",
 ]
 
 THIRD_PARTY_APPS = [
@@ -54,7 +53,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "core.handler.ExceptionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
+    "core.middlewares.ExceptionMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"
@@ -133,7 +133,7 @@ MEDIA_URL = "media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # Stop Warning about '/'
-APPEND_SLASH = False
+APPEND_SLASH = True
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
@@ -145,6 +145,8 @@ REST_FRAMEWORK = {
     "EXCEPTION_HANDLER": "core.handler.custom_exception_handler",
     "DEFAULT_RENDERER_CLASSES": [
         "core.renderers.CustomRenderer",
+        "rest_framework.renderers.JSONRenderer",
+        "rest_framework.renderers.BrowsableAPIRenderer",
     ],
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
@@ -176,3 +178,24 @@ DEFAULT_PROFILE_IMAGE = "images/profile/default.jpg"
 
 CORS_ORIGIN_WHITELIST = ["http://127.0.0.1:3000", "http://localhost:3000"]
 CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOW_METHODS = (
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+)
+
+CORS_ALLOW_HEADERS = (
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+)
