@@ -6,17 +6,18 @@ services:
     image: mysql:latest
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: p@ssword
       MYSQL_DATABASE: board
-      MYSQL_TZ: Asia/Seoul
+      MYSQL_ROOT_USER: root
+      MYSQL_ROOT_PASSWORD: rootpassword
+      DB_TZ: Asia/Seoul
     ports:
-      - 3310:3306
+      - 3307:3306
     volumes:
       - ./mysql:/var/lib/mysql
 
   # redis-server
   redis:
-    container_name: "board-redis"
+    container_name: board-redis
     image: redis:latest
     restart: always
     command: redis-server /usr/local/conf/redis.conf
@@ -25,3 +26,32 @@ services:
       - ./redis/conf/redis.conf:/usr/local/conf/redis.conf
     ports:
       - 6380:6379
+
+  web:
+    container_name: board-web
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    volumes:
+      - .:/web
+    command: >
+      sh -c "/wait-for-it.sh mysql:3307 -t 10
+             python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000"
+    environment:
+      DB_HOST: mysql
+      DB_DATABASE: board
+      DB_ROOT_USER: root
+      DB_ROOT_PASSWORD: rootpassword
+    ports:
+      - "8000:8000"
+    depends_on:
+      - mysql
+      - redis
+    healthcheck:
+      test: curl --fail 127.0.0.1 || exit 1
+      interval: 10s
+      retries: 5
+      start_period: 5s
+      timeout: 10s
