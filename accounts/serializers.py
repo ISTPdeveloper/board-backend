@@ -32,6 +32,7 @@ class RegisterSerializer(serializers.ModelSerializer):
                 nickname=validated_data["nickname"],
                 phone_number=validated_data["phone_number"],
                 photo=validated_data["photo"],
+                is_verified=1,
             )
             return user
 
