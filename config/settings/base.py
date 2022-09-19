@@ -1,8 +1,9 @@
 from datetime import timedelta
 import os
 from pathlib import Path
-import config.settings.env as ENV
+from dotenv import load_dotenv
 
+load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
@@ -11,10 +12,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = ENV.SECRET_KEY
+SECRET_KEY = os.getenv("SECRET_KEY")
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = ENV.DEBUG
+DEBUG = os.getenv("DEBUG")
 
 ALLOWED_HOSTS = ["*"]
 
@@ -81,17 +81,29 @@ WSGI_APPLICATION = "config.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
-DATABASES = ENV.DATABASES
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.mysql",
+        "HOST": os.getenv("DB_HOST"),
+        "NAME": os.getenv("DB_NAME"),
+        "USER": os.getenv("DB_USER"),
+        "PASSWORD": os.getenv("DB_PASSWORD"),
+        "PORT": os.getenv("DB_PORT"),
+    }
+}
 
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": f"redis://{ENV.REDIS_HOST}:{ENV.REDIS_PORT}",
+        "LOCATION": "redis://{}:{}".format(
+            os.getenv("REDIS_PORT"), os.getenv("REDIS_HOST")
+        ),
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         },
     }
 }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -160,16 +172,16 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "RORATE_REFRESH_TOKENS": False,
     "BLACKLIST_AFTER_LOTATION": True,
-    "SIGNING_KEY": ENV.JWT_SECRET_KEY,
+    "SIGNING_KEY": os.getenv("JWT_SECRET_KEY"),
     "ALGORITHM": "HS256",
     "AUTH_HEADER_TYPES": ("Bearer", "JWT"),
     "USER_AUTHENTICATION_RULE": "rest_framework_simplejwt.authentication.default_user_authentication_rule",
 }
 
-AWS_ACCESS_KEY_ID = ENV.AWS_ACCESS_KEY_ID
-AWS_SECRET_ACCESS_KEY = ENV.AWS_SECRET_ACCESS_KEY
-AWS_STORAGE_BUCKET_NAME = ENV.AWS_S3_BUCKET_NAME
-AWS_S3_REGION_NAME = ENV.AWS_REGION
+AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_S3_BUCKET_NAME")
+AWS_S3_REGION_NAME = os.getenv("AWS_REGION")
 AWS_DEFAULT_ACL = "public-read"
 AWS_S3_SECURE_URLS = False
 AWS_QUERYSTRING_AUTH = False

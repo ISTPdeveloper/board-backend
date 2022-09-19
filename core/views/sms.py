@@ -2,11 +2,11 @@ import base64
 import hashlib
 import hmac
 import json
+import os
 import random
 import time
 import requests
 import bcrypt
-import config.settings.env as ENV
 from json import JSONDecodeError
 from core.redis_connection import RedisConnection
 from rest_framework import generics
@@ -21,7 +21,7 @@ class SMSCodeRequestView(generics.GenericAPIView):
         self.rd = RedisConnection()
 
     def make_signature(self, message):
-        SECRET_KEY = bytes(ENV.SMS_SECRET_KEY, "UTF-8")
+        SECRET_KEY = bytes(os.getenv("SMS_SECRET_KEY"), "UTF-8")
 
         return base64.b64encode(
             hmac.new(SECRET_KEY, message, digestmod=hashlib.sha256).digest()
@@ -48,7 +48,12 @@ class SMSCodeRequestView(generics.GenericAPIView):
 
             timestamp = str(int(time.time() * 1000))
             message = (
-                "POST " + ENV.SMS_URI + "\n" + timestamp + "\n" + ENV.SMS_ACCESS_KEY
+                "POST "
+                + os.getenv("SMS_URI")
+                + "\n"
+                + timestamp
+                + "\n"
+                + os.getenv("SMS_ACCESS_KEY")
             )
             message = bytes(message, "UTF-8")
             signature = self.make_signature(message)
@@ -56,7 +61,7 @@ class SMSCodeRequestView(generics.GenericAPIView):
             headers = {
                 "Content-Type": "application/json; charset=UTF-8",
                 "x-ncp-apigw-timestamp": timestamp,
-                "x-ncp-iam-access-key": ENV.SMS_ACCESS_KEY,
+                "x-ncp-iam-access-key": os.getenv("SMS_ACCESS_KEY"),
                 "x-ncp-apigw-signature-v2": signature,
             }
 
@@ -64,13 +69,13 @@ class SMSCodeRequestView(generics.GenericAPIView):
                 "type": "sms",
                 "contentType": "COMM",
                 "countryCode": 82,
-                "from": ENV.SMS_CALLER,
+                "from": os.getenv("SMS_CALLER"),
                 "content": f"[대욱 게시판] 인증번호 [{random_code}]를 입력해주세요",
                 "messages": [{"to": phone_number}],
             }
 
             response = requests.post(
-                ENV.SMS_URL,
+                os.getenv("SMS_URL"),
                 data=json.dumps(body),
                 headers=headers,
             )
