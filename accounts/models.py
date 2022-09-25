@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractUser, BaseUserManager, Permission
 from config.settings.base import DEFAULT_PROFILE_IMAGE
 
 from core.models.base import BaseModel
-from core.s3_options import image_path
+from core.s3_options import profile_image_path
 from core.validations import (
     name_validate,
     password_validate,
@@ -55,7 +55,7 @@ class User(AbstractUser, PermissionsMixin, BaseModel):
         verbose_name="전화번호",
     )
     photo = models.FileField(
-        upload_to=image_path,
+        upload_to=profile_image_path,
         null=True,
         blank=True,
         verbose_name="사진",

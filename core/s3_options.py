@@ -1,6 +1,11 @@
 import uuid
 
 
-def image_path(instance, filename):
+def profile_image_path(instance, filename):
     filename = uuid.uuid4().hex
-    return f"images/{instance}/{filename}"
+    return f"images/profile/{filename}"
+
+
+def content_image_path(instance, filename):
+    filename = uuid.uuid4().hex
+    return f"images/content/{filename}"
