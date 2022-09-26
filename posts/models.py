@@ -15,7 +15,7 @@ POSTS_STATUS_CHOICES = [("public", "public"), ("private", "private")]
 
 class Post(BaseModel):
     title = models.CharField(max_length=30)
-    content = models.CharField(max_length=255)
+    content = models.TextField()
     category = models.CharField(
         max_length=30, choices=POSTS_CATEGORY_CHOICES, default="etc"
     )
@@ -25,10 +25,12 @@ class Post(BaseModel):
     photo = models.FileField(
         upload_to=content_image_path, null=True, blank=True, verbose_name="사진"
     )
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name="user")
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
         db_table = "post"
+        verbose_name = "게시물"
+        verbose_name_plural = "Posts"
 
     def __str__(self):
         return str(self.id)
