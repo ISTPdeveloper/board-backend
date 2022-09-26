@@ -14,17 +14,19 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     try:
 
-        def create(self, validated_data):
+        def validate(self, data):
             self.rd = RedisConnection()
-            auth = self.rd.conn.hgetall(validated_data["phone_number"])
+            auth = self.rd.conn.hgetall(data["phone_number"])
             if not auth:
                 raise serializers.ValidationError({"phone_number": "휴대폰 인증이 필요해요"})
             is_verified = auth["is_verified"]
-            if is_verified != "1":
+            if is_verified != str(1):
                 raise serializers.ValidationError({"phone_number": "인증이 완료되지 않았어요"})
-            if validated_data["photo"] is None:
-                validated_data["photo"] = DEFAULT_PROFILE_IMAGE
+            if data["photo"] is None:
+                data["photo"] = DEFAULT_PROFILE_IMAGE
+            return data
 
+        def create(self, validated_data):
             user = User.objects.create_user(
                 username=validated_data["username"],
                 password=validated_data["password"],
@@ -34,6 +36,7 @@ class RegisterSerializer(serializers.ModelSerializer):
                 photo=validated_data["photo"],
                 is_verified=1,
             )
+            print(user)
             return user
 
     except:

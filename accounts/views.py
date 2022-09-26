@@ -10,40 +10,38 @@ class RegisterAPIView(generics.GenericAPIView):
     serializer_class = RegisterSerializer
 
     def post(self, request):
-        if request.method == "POST":
-            serializer = self.get_serializer(data=request.data)
+        serializer = self.get_serializer(data=request.data)
 
-            serializer.is_valid(raise_exception=True)
+        if serializer.is_valid(raise_exception=True):
             user = serializer.save()
 
-            token = RefreshToken.for_user(user)
-            access_token = str(token.access_token)
-            refresh_token = str(token)
+        token = RefreshToken.for_user(user)
+        access_token = str(token.access_token)
+        refresh_token = str(token)
 
-            return Response(
-                data={"access": access_token, "refresh": refresh_token},
-                status=201,
-            )
+        return Response(
+            data={"access": access_token, "refresh": refresh_token},
+            status=201,
+        )
 
 
 class LoginAPIView(generics.GenericAPIView):
     serializer_class = LoginSerializer
 
     def post(self, request):
-        if request.method == "POST":
-            serializer = self.get_serializer(data=request.data)
+        serializer = self.get_serializer(data=request.data)
 
-            serializer.is_valid(raise_exception=True)
-            user = serializer.validated_data
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data
 
-            token = RefreshToken.for_user(user)
-            access_token = str(token.access_token)
-            refresh_token = str(token)
+        token = RefreshToken.for_user(user)
+        access_token = str(token.access_token)
+        refresh_token = str(token)
 
-            return Response(
-                data={"access": access_token, "refresh": refresh_token},
-                status=200,
-            )
+        return Response(
+            data={"access": access_token, "refresh": refresh_token},
+            status=200,
+        )
 
 
 class LogoutAPIView(generics.GenericAPIView):

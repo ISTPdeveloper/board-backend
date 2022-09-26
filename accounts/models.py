@@ -80,9 +80,9 @@ class User(AbstractUser, PermissionsMixin, BaseModel):
         db_table = "user"
         ordering = ["created_at"]
         verbose_name = "회원"
-        verbose_name_plural = "게시판 회원"
+        verbose_name_plural = "User"
 
     def __str__(self):
-        return str(self.id)
+        return str(self.name)
 
     is_verified.boolean = True

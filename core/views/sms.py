@@ -36,7 +36,7 @@ class SMSCodeRequestView(generics.GenericAPIView):
             hashed_random_code = bcrypt.hashpw(
                 random_code.encode("utf-8"), bcrypt.gensalt()
             ).decode("utf-8")
-            is_verified = "0"
+            is_verified = 0
 
             auth = {
                 "hashed_random_code": hashed_random_code,
@@ -112,10 +112,10 @@ class SMSCodeCheckView(generics.GenericAPIView):
             ):
                 return Response({"message": "CODE_NOT_MATCHED"}, status=400)
 
-            auth["is_verified"] = "1"
+            auth["is_verified"] = 1
 
             self.rd.conn.hmset(phone_number, auth)
-            return Response(status=201)
+            return Response(status=204)
 
         except KeyError:
             return Response({"message": "KEY_ERROR"}, status=400)
