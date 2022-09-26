@@ -2,6 +2,7 @@ from unicodedata import name
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from accounts.models import User
+from posts.models import Post
 
 
 class UserAdmin(BaseUserAdmin):
@@ -75,3 +76,41 @@ class UserAdmin(BaseUserAdmin):
 
 
 admin.site.register(User, UserAdmin)
+
+
+class PostAdmin(admin.ModelAdmin):
+    ordering = ["created_at"]
+    list_display = [
+        "title",
+        "content",
+        "category",
+        "status",
+        "created_at",
+        "author",
+    ]
+    fieldsets = (
+        (
+            ("게시물 작성"),
+            {
+                "fields": (
+                    "title",
+                    "content",
+                    "photo",
+                    "category",
+                )
+            },
+        ),
+        (("공개 / 비공개"), {"fields": ("status",)}),
+    )
+
+    search_fields = (
+        "title",
+        "content",
+    )
+    list_filter = (
+        "category",
+        "status",
+    )
+
+
+admin.site.register(Post, PostAdmin)
