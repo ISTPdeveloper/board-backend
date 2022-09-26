@@ -42,6 +42,7 @@ LOCAL_APPS = [
     "core",
     "accounts",
     "posts",
+    "comments",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -164,8 +165,6 @@ REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
-    # "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
-    # "PAGE_SIZE": 3,
 }
 
 AUTH_USER_MODEL = "accounts.User"
@@ -191,7 +190,7 @@ AWS_QUERYSTRING_AUTH = False
 DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
 DEFAULT_PROFILE_IMAGE = "images/profile/default.jpg"
 
-CORS_ORIGIN_WHITELIST = ["http://127.0.0.1:3000", "http://localhost:3000"]
+CORS_ORIGIN_WHITELIST = ["http://127.0.0.1:5173"]
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOW_METHODS = (
